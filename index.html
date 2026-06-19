@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Career Roadmap Generator</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1A1F;
+    --panel:#102229;
+    --panel-2:#15292F;
+    --rule:rgba(240,234,217,0.10);
+    --rule-soft:rgba(240,234,217,0.05);
+    --text:#F0EAD9;
+    --text-dim:#93A7AC;
+    --text-faint:#5E7176;
+    --trunk:#7C9499;
+    --junction:#F0EAD9;
+    --ml:#3D8FC4;
+    --ds:#E8A33D;
+    --pm:#B98ED9;
+    --ai:#E0708F;
+    --ops:#5FB37A;
+    --cv:#4FC3C8;
+    --nlp:#F07B52;
+    --research:#D6C75A;
+    --font-display:'Archivo',sans-serif;
+    --font-body:'IBM Plex Sans',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 20px 56px;}
+
+  header.top{margin-bottom:22px;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:900;
+    font-size:clamp(28px,4vw,40px);
+    line-height:1.05;
+    margin:0 0 10px;
+    letter-spacing:-0.01em;
+  }
+  .lede{
+    font-size:15px;
+    color:var(--text-dim);
+    max-width:640px;
+    margin:0 0 24px;
+  }
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
+  .chip{
+    display:flex;align-items:center;gap:8px;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    color:var(--text);
+    font-family:var(--font-body);
+    font-weight:500;
+    font-size:13px;
+    padding:8px 14px 8px 10px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:border-color .2s, background .2s;
+  }
+  .chip .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .chip:hover{border-color:var(--rule-soft);background:var(--panel-2);}
+  .chip[aria-pressed="true"]{
+    background:var(--panel-2);
+    border-color:currentColor;
+  }
+  .chip-row-note{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin:10px 0 28px;}
+
+  .course-search{
+    background:var(--panel);border:1px solid var(--rule);border-radius:6px;
+    padding:20px 22px;margin-bottom:28px;
+  }
+  .search-head{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:13px;}
+  .search-head h2{font-family:var(--font-display);font-size:18px;margin:0 0 3px;}
+  .search-head p{font-size:12.5px;color:var(--text-dim);margin:0;}
+  .search-count{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);}
+  .search-box{position:relative;}
+  .search-box input{
+    width:100%;background:var(--bg);color:var(--text);border:1px solid var(--rule);
+    border-radius:6px;padding:12px 42px 12px 14px;font:500 14px var(--font-body);outline:none;
+  }
+  .search-box input:focus{border-color:var(--trunk);box-shadow:0 0 0 3px var(--rule-soft);}
+  .search-box input::placeholder{color:var(--text-faint);}
+  .search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-faint);pointer-events:none;}
+  .search-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;}
+  .course-result{border:1px solid var(--rule);border-left:3px solid var(--lc,var(--trunk));background:var(--panel-2);border-radius:5px;padding:14px;}
+  .result-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .result-top h3{font-family:var(--font-display);font-size:14px;margin:0;}
+  .result-track{font-family:var(--font-mono);font-size:10px;color:var(--lc,var(--text-dim));margin-top:3px;}
+  .result-duration{font-family:var(--font-mono);font-size:10.5px;white-space:nowrap;color:var(--text-dim);}
+  .result-desc{font-size:12.5px;color:var(--text-dim);margin:10px 0;}
+  .result-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);display:block;margin:8px 0 2px;}
+  .result-copy{font-size:12px;color:var(--text-dim);margin:0;}
+  .result-jobs{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+  .result-jobs span{font-size:10.5px;color:var(--text);border:1px solid var(--rule);border-radius:999px;padding:3px 7px;}
+  .view-course{margin-top:11px;background:none;border:none;color:var(--lc,var(--text));font:500 11.5px var(--font-body);padding:0;cursor:pointer;}
+  .search-empty{grid-column:1/-1;text-align:center;color:var(--text-faint);font-size:13px;padding:18px;}
+
+  .map-scroll{
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    background:var(--panel);
+    padding:0;
+  }
+  .map-stage{
+    position:relative;
+    width:max(100%,1080px);
+    min-width:1080px;
+    aspect-ratio:1480/980;
+  }
+  .map-stage svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  #phaseLabels,#stationLayer{position:absolute;inset:0;}
+
+  .phase-label{
+    position:absolute;
+    transform:translateX(-50%);
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    white-space:nowrap;
+    pointer-events:none;
+  }
+
+  .station{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    background:none;
+    border:none;
+    padding:0;
+    cursor:pointer;
+    font-family:var(--font-body);
+    color:var(--text);
+  }
+  .station .dot{
+    width:15px;height:15px;border-radius:50%;
+    background:var(--bg);
+    border:2.5px solid var(--trunk);
+    display:block;margin:0 auto;
+    transition:transform .25s, border-color .25s, background .25s;
+  }
+  .station.is-junction .dot{
+    width:20px;height:20px;
+    border-width:3px;
+    border-color:var(--junction);
+  }
+  .station .cap{
+    position:absolute;left:50%;transform:translateX(-50%);
+    width:96px;
+    font-size:10.5px;
+    line-height:1.25;
+    color:var(--text-dim);
+    text-align:center;
+  }
+  .station .cap.above{bottom:14px;}
+  .station .cap.below{top:14px;}
+  .station:hover .dot,.station:focus-visible .dot{transform:scale(1.25);}
+  .station:focus-visible{outline:2px solid var(--text);outline-offset:4px;border-radius:50%;}
+  .station.is-active .dot{transform:scale(1.35);box-shadow:0 0 0 4px var(--bg);}
+  .station.is-active .cap{color:var(--text);font-weight:500;}
+  .station.is-known .dot{background:var(--lc,var(--trunk));border-color:var(--lc,var(--trunk));}
+
+  .terminus{
+    position:absolute;transform:translate(-50%,-50%);
+    border:none;cursor:pointer;
+    font-family:var(--font-display);font-weight:700;font-size:12.5px;
+    color:var(--bg);
+    background:var(--trunk);
+    padding:9px 16px;
+    border-radius:18px;
+    white-space:nowrap;
+    transition:transform .25s, background .25s, opacity .25s;
+    opacity:.45;
+  }
+  .terminus:focus-visible{outline:2px solid var(--text);outline-offset:3px;}
+  .terminus.is-active{opacity:1;transform:translate(-50%,-50%) scale(1.08);}
+
+  .legend-note{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-size:12px;color:var(--text-faint);}
+  .legend-note .dot{width:8px;height:8px;border-radius:50%;background:var(--trunk);flex:none;}
+
+  section.panel{
+    margin-top:28px;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:22px 24px;
+  }
+  .panel-head{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:1px solid var(--rule);
+  }
+  .panel-head h2{
+    font-family:var(--font-display);
+    font-size:19px;font-weight:700;margin:0 0 4px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .panel-head h2 .dot{width:11px;height:11px;border-radius:50%;}
+  .panel-head .sub{font-size:13px;color:var(--text-dim);margin:0;}
+  .stats{display:flex;gap:22px;flex-wrap:wrap;}
+  .stat{font-family:var(--font-mono);}
+  .stat .num{font-size:21px;font-weight:500;display:block;color:var(--text);}
+  .stat .lbl{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);}
+
+  ol.route{list-style:none;margin:0;padding:0;}
+  .row{
+    border-bottom:1px solid var(--rule-soft);
+  }
+  .row:last-child{border-bottom:none;}
+  .row-main{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 4px;
+    cursor:pointer;
+  }
+  .row-main input[type=checkbox]{
+    width:16px;height:16px;flex:none;accent-color:var(--lc,var(--trunk));cursor:pointer;
+  }
+  .row-num{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);width:22px;flex:none;}
+  .row-name{flex:1;font-size:14px;font-weight:500;}
+  .row.is-known .row-name{color:var(--text-faint);text-decoration:line-through;}
+  .row-weeks{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);flex:none;}
+  .row-caret{flex:none;color:var(--text-faint);font-size:11px;transition:transform .2s;width:14px;text-align:center;}
+  .row.is-open .row-caret{transform:rotate(90deg);}
+  .row-detail{
+    display:none;
+    padding:0 4px 16px 50px;
+    font-size:13px;color:var(--text-dim);
+    max-width:850px;
+  }
+  .row.is-open .row-detail{display:block;}
+  .row-detail .hint{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);margin-top:6px;display:block;}
+  .course-meta{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 10px;}
+  .course-meta span{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);border:1px solid var(--rule);background:var(--panel-2);border-radius:999px;padding:4px 8px;}
+  .course-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px;}
+  .course-block{border-left:2px solid var(--lc,var(--trunk));padding-left:11px;}
+  .course-block strong{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px;}
+  .course-block p{margin:0;color:var(--text-dim);}
+  .row.flash .row-main{animation:flash 1s ease;}
+  @keyframes flash{0%{background:var(--rule-soft);}100%{background:transparent;}}
+
+  .panel-foot{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    margin-top:18px;padding-top:16px;border-top:1px solid var(--rule);
+  }
+  button.action{
+    font-family:var(--font-body);font-weight:500;font-size:13px;
+    background:var(--panel-2);color:var(--text);
+    border:1px solid var(--rule);border-radius:6px;
+    padding:9px 16px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  button.action:hover{border-color:var(--rule-soft);}
+  button.action.ghost{background:transparent;}
+  .copy-status{font-family:var(--font-mono);font-size:11.5px;color:var(--ops);opacity:0;transition:opacity .25s;}
+  .copy-status.show{opacity:1;}
+
+  footer.note{
+    margin-top:18px;font-size:12px;color:var(--text-faint);max-width:760px;
+  }
+  .copyright{
+    margin-top:10px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.04em;
+    color:var(--text-faint);
+  }
+
+  @media (max-width:1024px){
+    .wrap{padding:24px 16px 48px;}
+    .search-results{grid-template-columns:1fr;}
+    section.panel{padding:20px 18px;}
+    .panel-head{gap:14px;}
+    .stats{gap:18px;}
+    .station .cap{width:84px;font-size:10px;}
+  }
+
+  @media (max-width:768px){
+    .wrap{padding:20px 14px 40px;}
+    h1{font-size:clamp(26px,8vw,36px);}
+    .lede{font-size:14px;max-width:none;}
+    .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .chip{width:100%;justify-content:flex-start;padding:10px 12px;}
+    .course-search{padding:18px 16px;}
+    .search-head{align-items:flex-start;}
+    .map-stage{width:1180px;min-width:1180px;}
+    .legend-note{font-size:11.5px;line-height:1.45;}
+    .panel-head{flex-direction:column;align-items:stretch;}
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    .stat .num{font-size:18px;}
+    .row-main{align-items:flex-start;gap:10px;padding:12px 2px;}
+    .row-name{font-size:13.5px;line-height:1.35;}
+    .row-weeks{font-size:11px;padding-top:1px;}
+    .row-detail{padding:0 2px 16px 30px;}
+    .panel-foot{align-items:stretch;}
+    .panel-foot > *{width:100%;}
+    .panel-foot > div{justify-content:space-between;}
+    button.action{justify-content:center;width:100%;}
+  }
+
+  @media (max-width:640px){
+    .top{margin-bottom:18px;}
+    .panel-head{flex-direction:column;}
+    .chips{grid-template-columns:1fr;}
+    .search-box input{padding:13px 42px 13px 14px;font-size:16px;}
+    .map-stage{width:1220px;min-width:1220px;}
+    .phase-label{font-size:10px;}
+    .result-top{flex-direction:column;}
+    .result-duration{white-space:normal;}
+    .stats{grid-template-columns:1fr;}
+    .course-grid{grid-template-columns:1fr;}
+    .row-main{display:grid;grid-template-columns:22px 18px 1fr auto 14px;align-items:start;}
+    .row-detail{padding-left:0;}
+    .panel-foot > div{flex-direction:column;align-items:stretch;}
+    .copy-status{text-align:center;}
+    .search-results{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">AI Career Roadmap Generator</p>
+    <h1>Pick a destination. We'll chart the route.</h1>
+    <p class="lede">Every track below starts the same way — the Foundations line everyone rides first. Once you reach Core ML Concepts, your line branches toward the role you're aiming for. Click any station for details, check off what you already know, and copy a roadmap built for exactly where you're standing.</p>
+
+    <div class="chips" id="roleChips" role="group" aria-label="Choose a target AI role"></div>
+    <p class="chip-row-note">— shared foundations run in grey, your chosen track lights up on the map below —</p>
+  </header>
+
+  <section class="course-search" aria-labelledby="courseSearchTitle">
+    <div class="search-head">
+      <div>
+        <h2 id="courseSearchTitle">Find a course</h2>
+        <p>Search by course, skill, topic, career track, or job title.</p>
+      </div>
+      <span class="search-count" id="searchCount">Start typing to explore courses</span>
+    </div>
+    <div class="search-box">
+      <input id="courseSearch" type="search" placeholder="Try “Python”, “computer vision”, “Docker”, or “data scientist”" autocomplete="off" aria-controls="courseSearchResults">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+    </div>
+    <div class="search-results" id="courseSearchResults" aria-live="polite"></div>
+  </section>
+
+  <div class="map-scroll">
+    <div class="map-stage" id="mapStage">
+      <svg viewBox="0 0 1480 980" preserveAspectRatio="none" role="img" aria-label="Transit-style map of AI career paths, branching from shared foundations into eight specialized roles">
+        <title>AI career roadmap map</title>
+        <g id="guideLayer"></g>
+        <g id="ghostLayer"></g>
+        <g id="highlightLayer"></g>
+        <g id="pulseLayer"></g>
+      </svg>
+      <div id="phaseLabels"></div>
+      <div id="stationLayer"></div>
+    </div>
+  </div>
+  <p class="legend-note"><span class="dot"></span> grey line = Foundations, shared by every track</p>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2><span class="dot" id="routeDot"></span><span id="routeTitle">ML Engineer</span></h2>
+        <p class="sub" id="routeSub">Foundations → Core ML Concepts → specialization</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="num" id="statStops">0</span><span class="lbl">Stops left</span></div>
+        <div class="stat"><span class="num" id="statWeeks">0</span><span class="lbl">Weeks left</span></div>
+        <div class="stat"><span class="num" id="statMonths">0</span><span class="lbl">~Months</span></div>
+      </div>
+    </div>
+
+    <ol class="route" id="routeList"></ol>
+
+    <div class="panel-foot">
+      <button class="action ghost" id="resetBtn" type="button">Reset known skills</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="copy-status" id="copyStatus">Copied to clipboard</span>
+        <button class="action" id="copyBtn" type="button">Copy my roadmap</button>
+      </div>
+    </div>
+  </section>
+
+  <textarea id="copyFallback" style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true"></textarea>
+
+  <footer class="note">Time estimates assume self-paced study at roughly 8–10 hours a week and vary a lot by background — treat this as a planning sketch to adjust, not a guarantee. Check off anything you're already comfortable with and the totals update to reflect what's actually left.</footer>
+
+  <div class="copyright">Copyright © SHREYANSH</div>
+</div>
+
+<script>
+(function(){
+  var Y = {pm:100, ds:210, cv:320, ml:490, ai:610, nlp:720, ops:830, research:930};
+  var BEND_X = 680, STOP_X = [760,890,1020,1150], TERM_X = 1300;
+
+  var TRUNK = [
+    {id:'start', x:70, y:490, kind:'start', label:'You are here', weeks:0,
+      desc:'Wherever you are starting from, even total beginner — this is the on-ramp every track shares.', hint:''},
+    {id:'t1', x:200, y:490, kind:'stop', label:'Python & Programming Basics', weeks:5, level:'Beginner', topics:'Variables, data types, loops, functions, files, errors, modules, and Git basics', project:'Build a command-line expense tracker that saves and analyzes data.',
+      desc:'Variables, control flow, functions — enough comfort in code to automate a small task without help.', hint:'A beginner Python course, then 10–15 tiny scripts of your own.'},
+    {id:'t2', x:330, y:490, kind:'stop', label:'Math for ML', weeks:5, level:'Beginner', topics:'Vectors, matrices, derivatives, gradients, probability, distributions, and statistics', project:'Implement linear regression and gradient descent with NumPy.',
+      desc:'Linear algebra, basic calculus, and probability & statistics — the language models are written in.', hint:'An applied "math for ML" course, not a full math degree.'},
+    {id:'t3', x:460, y:490, kind:'stop', label:'Data Wrangling', weeks:4, level:'Beginner', topics:'NumPy, pandas, SQL, missing values, joins, feature cleaning, and visualization', project:'Clean a messy public dataset and publish a short data report.',
+      desc:'pandas, SQL, and cleaning messy real-world data — the unglamorous bulk of most AI work.', hint:'Practice on two or three public, genuinely messy datasets.'},
+    {id:'junction', x:590, y:490, kind:'junction', label:'Core ML Concepts', weeks:5, level:'Intermediate', topics:'Learning types, train/test splits, leakage, overfitting, metrics, and cross-validation', project:'Train, compare, and explain three baseline models on one dataset.',
+      desc:'Supervised vs. unsupervised learning, train/test splits, overfitting, model evaluation — the shared vocabulary every track builds on.', hint:'One solid intro-to-ML course covers most of this.'}
+  ];
+
+  var LINES = {
+    ml:{ name:'ML Engineer', color:'var(--ml)', cssVar:'--ml', y:Y.ml, bend:false,
+      stops:[
+        {id:'ml1', label:'Classical ML', weeks:5, desc:'scikit-learn: regression, decision trees, ensembles — and knowing when a simple model beats a deep one.', hint:'Rebuild 3–4 classic models from scratch on toy data.'},
+        {id:'ml2', label:'Deep Learning', weeks:8, desc:'Neural networks, training loops, and GPUs, in PyTorch or TensorFlow.', hint:'Pick one framework and finish two or three projects end to end.'},
+        {id:'ml3', label:'Model Deployment', weeks:5, desc:'Wrapping a trained model in an API and a container so other software can actually use it.', hint:'Ship one model behind a simple API.'},
+        {id:'ml4', label:'ML Pipelines', weeks:5, desc:'Versioning data and models, automated retraining, and the basics of production monitoring.', hint:'Learn one MLOps tool well rather than five shallowly.'}
+      ],
+      terminus:{id:'ml-end', label:'ML Engineer', weeks:4, desc:'Portfolio polish, mock interviews, applications — you are job-ready.', hint:'Two or three deployed projects beat ten half-finished ones.'}
+    },
+    ds:{ name:'Data Scientist', color:'var(--ds)', cssVar:'--ds', y:Y.ds, bend:true,
+      stops:[
+        {id:'ds1', label:'Statistics & Experiment Design', weeks:5, desc:'Hypothesis testing, A/B tests, and the difference between correlation and causation.', hint:'Design and analyze one real A/B-style experiment.'},
+        {id:'ds2', label:'Exploratory Data Analysis', weeks:4, desc:'Finding patterns and anomalies in data before modeling anything.', hint:'Turn one raw dataset into three genuinely clear charts.'},
+        {id:'ds3', label:'Predictive Modeling', weeks:6, desc:'Feature engineering and applied modeling for business questions, not just accuracy scores.', hint:'Solve one open modeling problem end to end.'},
+        {id:'ds4', label:'Communicating Insights', weeks:3, desc:'Turning analysis into decisions stakeholders actually act on.', hint:'Practice explaining one finding to a non-technical audience.'}
+      ],
+      terminus:{id:'ds-end', label:'Data Scientist', weeks:4, desc:'Portfolio polish, mock interviews, applications — you are job-ready.', hint:'Show your reasoning, not just your results.'}
+    },
+    cv:{ name:'Computer Vision Engineer', color:'var(--cv)', cssVar:'--cv', y:Y.cv, bend:true,
+      stops:[
+        {id:'cv1', label:'Image Processing', weeks:4, level:'Intermediate', topics:'Pixels, color spaces, filtering, edges, contours, augmentation, and OpenCV', project:'Build a document scanner and image enhancement pipeline.', desc:'Learn how digital images are represented, transformed, and prepared for models.', hint:'Use OpenCV and NumPy before reaching for deep learning.'},
+        {id:'cv2', label:'CNNs & Transfer Learning', weeks:6, level:'Intermediate', topics:'Convolutions, pooling, architectures, augmentation, fine-tuning, and regularization', project:'Fine-tune an image classifier on a custom dataset.', desc:'Train robust visual classifiers using modern convolutional networks and pretrained backbones.', hint:'PyTorch or TensorFlow; choose one framework and stay with it.'},
+        {id:'cv3', label:'Detection & Segmentation', weeks:6, level:'Advanced', topics:'Bounding boxes, IoU, YOLO, region models, semantic and instance segmentation', project:'Build a detector or segmenter for a real-world use case.', desc:'Move beyond classification to locate and outline objects inside images.', hint:'Include class imbalance and error analysis in your evaluation.'},
+        {id:'cv4', label:'Vision Deployment', weeks:5, level:'Advanced', topics:'Video inference, ONNX, quantization, batching, edge devices, and monitoring', project:'Deploy a real-time vision API or edge demo.', desc:'Optimize visual models for reliable inference under latency and hardware constraints.', hint:'Measure accuracy, latency, memory use, and failure cases.'}
+      ],
+      terminus:{id:'cv-end', label:'CV Engineer', weeks:4, desc:'Package two polished vision projects, prepare interviews, and begin targeted applications.', hint:'Show both model quality and production performance.'}
+    },
+    pm:{ name:'AI Product Manager', color:'var(--pm)', cssVar:'--pm', y:Y.pm, bend:true,
+      stops:[
+        {id:'pm1', label:'AI/ML Literacy', weeks:4, desc:'Enough hands-on ML knowledge to know what is realistic to ask an ML team for.', hint:'Take a non-coding "AI for product managers" style course.'},
+        {id:'pm2', label:'Translating Problems into ML Specs', weeks:4, desc:'Turning a business problem into something a data team can actually scope and build.', hint:'Practice writing one ML problem spec start to finish.'},
+        {id:'pm3', label:'Scoping Experiments', weeks:4, desc:'Working with data scientists to define success metrics and feasible experiments.', hint:'Shadow or partner with a working data team.'},
+        {id:'pm4', label:'Responsible AI & Risk', weeks:4, desc:'Bias, privacy, and failure modes, and how to weigh them against shipping speed.', hint:'Study a few public AI-failure case studies.'}
+      ],
+      terminus:{id:'pm-end', label:'AI Product Manager', weeks:4, desc:'Portfolio polish, mock interviews, applications — you are job-ready.', hint:'Lead with outcomes you shaped, not tools you know.'}
+    },
+    ai:{ name:'AI Engineer (LLM)', color:'var(--ai)', cssVar:'--ai', y:Y.ai, bend:true,
+      stops:[
+        {id:'ai1', label:'LLM Fundamentals', weeks:4, desc:'Transformers and embeddings at a working level — enough to reason about behavior, not implement one from scratch.', hint:'One solid LLM-fundamentals course or guide.'},
+        {id:'ai2', label:'Prompt Engineering & Evaluation', weeks:4, desc:'Getting reliable behavior out of a model, and actually measuring whether it works.', hint:'Build and score a small prompt test suite.'},
+        {id:'ai3', label:'RAG, Agents & Tool Use', weeks:6, desc:'Connecting a model to your own data and letting it take actions, not just answer questions.', hint:'Build one small RAG app and one tool-using agent.'},
+        {id:'ai4', label:'Shipping LLM Apps', weeks:5, desc:'Latency, cost, and safety guardrails — turning a demo into something real users can rely on.', hint:'Ship one LLM feature to real, even if few, users.'}
+      ],
+      terminus:{id:'ai-end', label:'AI Engineer', weeks:4, desc:'Portfolio polish, mock interviews, applications — you are job-ready.', hint:'One deployed app beats five notebook demos.'}
+    },
+    nlp:{ name:'NLP Engineer', color:'var(--nlp)', cssVar:'--nlp', y:Y.nlp, bend:true,
+      stops:[
+        {id:'nlp1', label:'Text Processing & Linguistics', weeks:4, level:'Intermediate', topics:'Tokenization, normalization, morphology, syntax, corpora, and text classification', project:'Build a multilingual text-cleaning and analysis pipeline.', desc:'Understand the structure of language data and create dependable preprocessing workflows.', hint:'Compare rule-based and statistical approaches on noisy text.'},
+        {id:'nlp2', label:'Embeddings & Sequence Models', weeks:5, level:'Intermediate', topics:'TF-IDF, word vectors, recurrent networks, attention, similarity, and retrieval', project:'Create a semantic search or intent-classification system.', desc:'Represent language numerically and model relationships across words and sequences.', hint:'Evaluate against a simple lexical baseline.'},
+        {id:'nlp3', label:'Transformers & Fine-tuning', weeks:6, level:'Advanced', topics:'Transformer blocks, pretrained models, fine-tuning, PEFT, tagging, and question answering', project:'Fine-tune a transformer for a domain-specific NLP task.', desc:'Adapt pretrained language models to classification, extraction, and generation tasks.', hint:'Track data quality, compute cost, and task-specific metrics.'},
+        {id:'nlp4', label:'Production NLP Systems', weeks:5, level:'Advanced', topics:'Serving, batching, latency, drift, multilingual evaluation, bias, and observability', project:'Deploy and monitor a text intelligence API.', desc:'Turn an NLP notebook into a tested, measurable production service.', hint:'Document difficult examples and responsible-AI risks.'}
+      ],
+      terminus:{id:'nlp-end', label:'NLP Engineer', weeks:4, desc:'Polish a language-focused portfolio and prepare for NLP system-design interviews.', hint:'Demonstrate rigorous evaluation, not only impressive outputs.'}
+    },
+    ops:{ name:'MLOps Engineer', color:'var(--ops)', cssVar:'--ops', y:Y.ops, bend:true,
+      stops:[
+        {id:'ops1', label:'Cloud Platforms', weeks:5, desc:'Comfort with AWS, GCP, or Azure — compute, storage, and basic networking for ML workloads.', hint:'One cloud certification, or equivalent hands-on practice.'},
+        {id:'ops2', label:'CI/CD & Containerization', weeks:6, desc:'Automated testing and Docker, so ML code ships as reliably as any other software.', hint:'Containerize and auto-deploy one project.'},
+        {id:'ops3', label:'Model Monitoring', weeks:5, desc:'Catching data drift and silent model failures before users do.', hint:'Set up monitoring on one toy production model.'},
+        {id:'ops4', label:'Distributed Training Infra', weeks:6, desc:'Scaling training across multiple GPUs or machines without wasting compute.', hint:'Read how one real ML infra team describes their stack.'}
+      ],
+      terminus:{id:'ops-end', label:'MLOps Engineer', weeks:4, desc:'Portfolio polish, mock interviews, applications — you are job-ready.', hint:'Show systems you have kept running, not just built.'}
+    },
+    research:{ name:'AI Research Scientist', color:'var(--research)', cssVar:'--research', y:Y.research, bend:true,
+      stops:[
+        {id:'res1', label:'Advanced Mathematics', weeks:7, level:'Advanced', topics:'Optimization, information theory, matrix calculus, probabilistic modeling, and estimation', project:'Derive and implement the key equations from a selected ML paper.', desc:'Deepen the mathematical toolkit needed to understand and create learning algorithms.', hint:'Work through exercises; passive video watching is not enough here.'},
+        {id:'res2', label:'Research Methods', weeks:5, level:'Advanced', topics:'Literature review, hypotheses, baselines, ablations, reproducibility, and statistical testing', project:'Write a research proposal with an experiment and analysis plan.', desc:'Learn to ask testable questions and design experiments that produce credible evidence.', hint:'Reproduce one published result before proposing an extension.'},
+        {id:'res3', label:'Paper Reproduction', weeks:8, level:'Advanced', topics:'Paper reading, implementation, experiment tracking, hyperparameters, debugging, and reporting', project:'Reproduce a recent paper and publish code plus a variance-aware report.', desc:'Convert dense research papers into working implementations and verified results.', hint:'Choose a paper whose data and compute requirements fit your hardware.'},
+        {id:'res4', label:'Original Research Project', weeks:10, level:'Advanced', topics:'Novelty, experiment iteration, negative results, visualization, peer feedback, and technical writing', project:'Complete and present an original research project or workshop-style paper.', desc:'Formulate, test, and communicate a small original contribution.', hint:'Seek feedback early from a mentor or research community.'}
+      ],
+      terminus:{id:'res-end', label:'Research Scientist', weeks:6, desc:'Prepare a research portfolio, paper presentation, interviews, and graduate or lab applications.', hint:'Strong evidence and reproducibility matter more than fashionable terminology.'}
+    }
+  };
+
+  var ROLE_JOBS = {
+    ml:['Machine Learning Engineer','Applied ML Engineer','AI Software Engineer'],
+    ds:['Data Scientist','Product Data Scientist','Decision Scientist'],
+    cv:['Computer Vision Engineer','Vision ML Engineer','Image Processing Engineer'],
+    pm:['AI Product Manager','Technical Product Manager','AI Program Manager'],
+    ai:['AI Engineer','LLM Application Engineer','Generative AI Developer'],
+    nlp:['NLP Engineer','Computational Linguist','Language AI Engineer'],
+    ops:['MLOps Engineer','ML Platform Engineer','AI Infrastructure Engineer'],
+    research:['AI Research Scientist','Research Engineer','Applied Scientist']
+  };
+
+  Object.keys(LINES).forEach(function(key){
+    var line = LINES[key];
+    line.key = key;
+    line.allStops = [];
+    line.stops.forEach(function(s, i){ s.x = STOP_X[i]; s.y = line.y; s.role = key; s.kind='stop'; line.allStops.push(s); });
+    line.terminus.x = TERM_X; line.terminus.y = line.y; line.terminus.role = key; line.terminus.kind='terminus';
+  });
+
+  function fullPathPoints(line){
+    var pts = TRUNK.map(function(s){ return [s.x, s.y]; });
+    if(line.bend) pts.push([BEND_X, line.y]);
+    line.stops.forEach(function(s){ pts.push([s.x, s.y]); });
+    pts.push([line.terminus.x, line.terminus.y]);
+    return pts;
+  }
+  function pathD(pts){ return 'M' + pts.map(function(p){return p[0]+','+p[1];}).join(' L '); }
+
+  var svgNS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){
+    var e = document.createElementNS(svgNS, tag);
+    for(var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  var guideLayer = document.getElementById('guideLayer');
+  var ghostLayer = document.getElementById('ghostLayer');
+  var highlightLayer = document.getElementById('highlightLayer');
+  var pulseLayer = document.getElementById('pulseLayer');
+  var phaseLabels = document.getElementById('phaseLabels');
+  var stationLayer = document.getElementById('stationLayer');
+
+  STOP_X.concat([TERM_X]).forEach(function(x){
+    guideLayer.appendChild(el('line', {x1:x,y1:65,x2:x,y2:955,stroke:'var(--rule-soft)','stroke-width':1,'stroke-dasharray':'2 6'}));
+  });
+
+  var phaseDefs = [
+    {x:330, text:'Phase 0 — Foundations'},
+    {x:760, text:'Phase 1'},
+    {x:890, text:'Phase 2'},
+    {x:1020, text:'Phase 3'},
+    {x:1150, text:'Phase 4'},
+    {x:1300, text:'Ready'}
+  ];
+  phaseDefs.forEach(function(p){
+    var d = document.createElement('div');
+    d.className = 'phase-label';
+    d.style.left = (p.x/1480*100)+'%';
+    d.style.top = '3%';
+    d.textContent = p.text;
+    phaseLabels.appendChild(d);
+  });
+
+  var trunkD = pathD(TRUNK.map(function(s){return [s.x,s.y];}));
+  ghostLayer.appendChild(el('path', {d:trunkD, fill:'none', stroke:'var(--trunk)', 'stroke-width':5, 'stroke-linecap':'round', opacity:.55}));
+
+  Object.keys(LINES).forEach(function(key){
+    var line = LINES[key];
+    var pts = fullPathPoints(line);
+    var d = pathD(pts);
+    line.pathD = d;
+    ghostLayer.appendChild(el('path', {d:d, fill:'none', stroke:line.color, 'stroke-width':5, 'stroke-linecap':'round', opacity:.22}));
+    var hp = el('path', {d:d, fill:'none', stroke:line.color, 'stroke-width':9, 'stroke-linecap':'round', opacity:0});
+    hp.style.transition = 'opacity .45s ease';
+    hp.setAttribute('data-line', key);
+    highlightLayer.appendChild(hp);
+
+    var pulse = el('circle', {r:6, fill:line.color, opacity:0});
+    pulse.style.transition='opacity .3s ease';
+    pulse.setAttribute('data-line', key);
+    var motion = el('animateMotion', {dur:'3.4s', repeatCount:'indefinite', path:d});
+    pulse.appendChild(motion);
+    pulseLayer.appendChild(pulse);
+  });
+
+  function pct(v, total){ return (v/total*100)+'%'; }
+
+  function makeStationBtn(s, role, lineColorVar){
+    var btn = document.createElement('button');
+    btn.className = 'station';
+    btn.type = 'button';
+    btn.id = 'st-'+s.id;
+    btn.style.left = pct(s.x,1480);
+    btn.style.top = pct(s.y,980);
+    btn.setAttribute('data-id', s.id);
+    if(role) btn.setAttribute('data-role', role);
+    if(lineColorVar) btn.style.setProperty('--lc','var('+lineColorVar+')');
+    if(s.kind==='junction') btn.classList.add('is-junction');
+    btn.setAttribute('aria-label', s.label);
+    var capClass = (role==='ml' || !role) ? 'above' : 'below';
+    if(role==='ml') capClass='below';
+    if(!role) capClass='above';
+    btn.innerHTML = '<span class="dot"></span><span class="cap '+capClass+'">'+s.label+'</span>';
+    return btn;
+  }
+
+  TRUNK.forEach(function(s){
+    if(s.kind==='start') return;
+    stationLayer.appendChild(makeStationBtn(s, null, null));
+  });
+
+  Object.keys(LINES).forEach(function(key){
+    var line = LINES[key];
+    line.stops.forEach(function(s){ stationLayer.appendChild(makeStationBtn(s, key, line.cssVar)); });
+    var t = document.createElement('button');
+    t.className = 'terminus';
+    t.type = 'button';
+    t.id = 'st-'+line.terminus.id;
+    t.style.left = pct(line.terminus.x,1480);
+    t.style.top = pct(line.terminus.y,980);
+    t.setAttribute('data-id', line.terminus.id);
+    t.setAttribute('data-role', key);
+    t.style.setProperty('background','var('+line.cssVar+')');
+    t.textContent = line.terminus.label;
+    stationLayer.appendChild(t);
+  });
+
+  var roleChips = document.getElementById('roleChips');
+  Object.keys(LINES).forEach(function(key){
+    var line = LINES[key];
+    var chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.type = 'button';
+    chip.setAttribute('data-role', key);
+    chip.setAttribute('aria-pressed','false');
+    chip.style.color = 'var('+line.cssVar+')';
+    chip.innerHTML = '<span class="dot" style="background:var('+line.cssVar+')"></span>'+line.name;
+    roleChips.appendChild(chip);
+  });
+
+  var knownSet = new Set();
+  var selectedRole = 'ml';
+  var openRow = null;
+
+  function allStationsForRole(role){
+    var line = LINES[role];
+    return TRUNK.filter(function(s){return s.kind!=='start';}).concat(line.stops, [line.terminus]);
+  }
+
+  function courseLevel(s, idx){
+    if(s.level) return s.level;
+    if(idx < 3) return 'Beginner';
+    if(idx < 6) return 'Intermediate';
+    return 'Advanced';
+  }
+
+  function courseDetail(s, idx){
+    var hoursMin = s.weeks * 8;
+    var hoursMax = s.weeks * 10;
+    var outline = s.topics || s.desc;
+    var outcome = s.project || s.hint || 'Create a portfolio artifact that demonstrates this skill in practice.';
+    return '<p>'+s.desc+'</p>'+
+      '<div class="course-meta">'+
+        '<span>'+courseLevel(s, idx)+'</span>'+
+        '<span>'+s.weeks+' weeks</span>'+
+        '<span>8–10 hrs/week</span>'+
+        '<span>'+hoursMin+'–'+hoursMax+' total hours</span>'+
+      '</div>'+
+      '<div class="course-grid">'+
+        '<div class="course-block"><strong>Course outline</strong><p>'+outline+'</p></div>'+
+        '<div class="course-block"><strong>Practical outcome</strong><p>'+outcome+'</p></div>'+
+      '</div>'+
+      (s.hint && s.project ? '<span class="hint">Study note: '+s.hint+'</span>' : '');
+  }
+
+  function escapeHTML(value){
+    return String(value).replace(/[&<>"']/g, function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch];
+    });
+  }
+
+  function courseSearchIndex(){
+    var records = [];
+    var allJobs = [];
+    Object.keys(ROLE_JOBS).forEach(function(key){ allJobs = allJobs.concat(ROLE_JOBS[key]); });
+    TRUNK.filter(function(s){ return s.kind !== 'start'; }).forEach(function(s){
+      records.push({course:s, role:null, track:'Shared AI Foundations', jobs:allJobs, cssVar:'--trunk'});
+    });
+    Object.keys(LINES).forEach(function(key){
+      LINES[key].stops.forEach(function(s){
+        records.push({course:s, role:key, track:LINES[key].name, jobs:ROLE_JOBS[key], cssVar:LINES[key].cssVar});
+      });
+    });
+    return records;
+  }
+
+  var searchableCourses = courseSearchIndex();
+
+  function renderCourseSearch(query){
+    var q = query.trim().toLowerCase();
+    var resultsEl = document.getElementById('courseSearchResults');
+    var countEl = document.getElementById('searchCount');
+    if(!q){
+      resultsEl.innerHTML = '<div class="search-empty">Enter a course, topic, career track, or job title to see matching course details.</div>';
+      countEl.textContent = searchableCourses.length+' courses available';
+      return;
+    }
+    var matches = searchableCourses.filter(function(item){
+      var s = item.course;
+      return [s.label,s.desc,s.topics,s.hint,s.project,item.track,item.jobs.join(' ')].join(' ').toLowerCase().indexOf(q) !== -1;
+    });
+    countEl.textContent = matches.length ? matches.length+' course'+(matches.length===1?'':'s')+' found' : 'No courses found';
+    if(!matches.length){
+      resultsEl.innerHTML = '<div class="search-empty">No match for “'+escapeHTML(query)+'”. Try a broader skill such as Python, statistics, cloud, language, or vision.</div>';
+      return;
+    }
+    resultsEl.innerHTML = matches.slice(0,12).map(function(item){
+      var s = item.course;
+      var courseType = item.role ? item.track+' specialization' : (s.kind==='junction' ? 'Core machine-learning course' : 'Foundation course');
+      var outcome = s.project || s.hint || 'Complete a practical portfolio project using this skill.';
+      return '<article class="course-result" style="--lc:var('+item.cssVar+')">'+
+        '<div class="result-top"><div><h3>'+escapeHTML(s.label)+'</h3><div class="result-track">'+escapeHTML(courseType)+'</div></div><span class="result-duration">'+s.weeks+' weeks · '+courseLevel(s, item.role ? 5 : 1)+'</span></div>'+
+        '<p class="result-desc">'+escapeHTML(s.desc)+'</p>'+
+        '<span class="result-label">What you will learn</span><p class="result-copy">'+escapeHTML(s.topics || s.desc)+'</p>'+
+        '<span class="result-label">Course project</span><p class="result-copy">'+escapeHTML(outcome)+'</p>'+
+        '<span class="result-label">Related jobs</span><div class="result-jobs">'+item.jobs.slice(0,item.role ? 3 : 5).map(function(job){return '<span>'+escapeHTML(job)+'</span>';}).join('')+'</div>'+
+        '<button class="view-course" type="button" data-view-course="'+s.id+'" data-view-role="'+(item.role || '')+'">View in full roadmap →</button>'+
+      '</article>';
+    }).join('');
+    if(matches.length > 12) countEl.textContent += ' · showing first 12';
+  }
+
+  function render(){
+    Object.keys(LINES).forEach(function(key){
+      var active = key===selectedRole;
+      var hp = highlightLayer.querySelector('[data-line="'+key+'"]');
+      var pulse = pulseLayer.querySelector('[data-line="'+key+'"]');
+      hp.style.opacity = active ? 1 : 0;
+      pulse.style.opacity = active ? 1 : 0;
+    });
+
+    roleChips.querySelectorAll('.chip').forEach(function(c){
+      var on = c.getAttribute('data-role')===selectedRole;
+      c.setAttribute('aria-pressed', on ? 'true':'false');
+    });
+
+    stationLayer.querySelectorAll('.station[data-role], .terminus[data-role]').forEach(function(b){
+      b.classList.toggle('is-active', b.getAttribute('data-role')===selectedRole);
+    });
+    stationLayer.querySelectorAll('.station, .terminus').forEach(function(b){
+      var id = b.getAttribute('data-id');
+      b.classList.toggle('is-known', knownSet.has(id));
+    });
+
+    var line = LINES[selectedRole];
+    document.getElementById('routeDot').style.background = 'var('+line.cssVar+')';
+    document.getElementById('routeTitle').textContent = line.name;
+    document.getElementById('routeSub').textContent = 'Foundations → Core ML Concepts → '+line.name;
+
+    var stations = allStationsForRole(selectedRole);
+    var remaining = stations.filter(function(s){return !knownSet.has(s.id);});
+    var weeksLeft = remaining.reduce(function(a,s){return a+s.weeks;},0);
+    document.getElementById('statStops').textContent = remaining.length;
+    document.getElementById('statWeeks').textContent = weeksLeft;
+    document.getElementById('statMonths').textContent = (weeksLeft/4.33).toFixed(1);
+
+    var list = document.getElementById('routeList');
+    list.innerHTML = '';
+    stations.forEach(function(s, idx){
+      var li = document.createElement('li');
+      li.className = 'row';
+      li.style.setProperty('--lc', 'var('+line.cssVar+')');
+      if(knownSet.has(s.id)) li.classList.add('is-known');
+      if(openRow===s.id) li.classList.add('is-open');
+      li.id = 'row-'+s.id;
+      li.setAttribute('data-id', s.id);
+      li.innerHTML =
+        '<div class="row-main">'+
+          '<span class="row-num">'+String(idx+1).padStart(2,'0')+'</span>'+
+          '<input type="checkbox" aria-label="Mark '+s.label+' as already known" data-check="'+s.id+'" '+(knownSet.has(s.id)?'checked':'')+'>'+
+          '<span class="row-name">'+s.label+'</span>'+
+          '<span class="row-weeks">'+s.weeks+' wks</span>'+
+          '<span class="row-caret">&#9656;</span>'+
+        '</div>'+
+        '<div class="row-detail">'+courseDetail(s, idx)+'</div>';
+      list.appendChild(li);
+    });
+  }
+
+  roleChips.addEventListener('click', function(e){
+    var chip = e.target.closest('.chip');
+    if(!chip) return;
+    selectedRole = chip.getAttribute('data-role');
+    render();
+  });
+
+  stationLayer.addEventListener('click', function(e){
+    var btn = e.target.closest('.station, .terminus');
+    if(!btn) return;
+    var id = btn.getAttribute('data-id');
+    var role = btn.getAttribute('data-role');
+    if(role && role!==selectedRole){
+      selectedRole = role;
+      render();
+    }
+    openRow = (openRow===id) ? null : id;
+    render();
+    var row = document.getElementById('row-'+id);
+    if(row){
+      row.scrollIntoView({behavior:'smooth', block:'center'});
+      row.classList.add('flash');
+      setTimeout(function(){row.classList.remove('flash');}, 1000);
+    }
+  });
+
+  document.getElementById('routeList').addEventListener('click', function(e){
+    if(e.target.matches('input[type=checkbox]')){
+      var id = e.target.getAttribute('data-check');
+      if(e.target.checked) knownSet.add(id); else knownSet.delete(id);
+      render();
+      return;
+    }
+    var main = e.target.closest('.row-main');
+    if(!main) return;
+    var row = main.closest('.row');
+    var id = row.getAttribute('data-id');
+    openRow = (openRow===id) ? null : id;
+    render();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    knownSet.clear();
+    render();
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var line = LINES[selectedRole];
+    var stations = allStationsForRole(selectedRole).filter(function(s){return !knownSet.has(s.id);});
+    var weeksLeft = stations.reduce(function(a,s){return a+s.weeks;},0);
+    var lines = [
+      'AI CAREER ROADMAP — '+line.name,
+      'Estimated time remaining: '+weeksLeft+' weeks (~'+(weeksLeft/4.33).toFixed(1)+' months) at ~8-10 hrs/week',
+      ''
+    ];
+    stations.forEach(function(s, i){
+      lines.push((i+1)+'. '+s.label+' — '+s.weeks+' weeks ('+courseLevel(s, i)+')');
+      lines.push('   Focus: '+(s.topics || s.desc));
+      lines.push('   Outcome: '+(s.project || s.hint || 'Create a portfolio artifact for this skill.'));
+    });
+    var text = lines.join('\n');
+    var status = document.getElementById('copyStatus');
+    function showCopied(){
+      status.textContent = 'Copied to clipboard';
+      status.classList.add('show');
+      setTimeout(function(){status.classList.remove('show');}, 2200);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showCopied).catch(function(){ fallbackCopy(text, showCopied); });
+    } else {
+      fallbackCopy(text, showCopied);
+    }
+  });
+
+  function fallbackCopy(text, onDone){
+    var ta = document.getElementById('copyFallback');
+    ta.value = text;
+    ta.style.left = '0'; ta.style.top='0'; ta.style.opacity='0';
+    ta.select();
+    try{ document.execCommand('copy'); onDone(); }
+    catch(e){
+      var status = document.getElementById('copyStatus');
+      status.textContent = 'Could not auto-copy — text selected, press Ctrl/Cmd+C';
+      status.classList.add('show');
+    }
+    ta.style.left='-9999px'; ta.style.top='-9999px';
+  }
+
+  document.getElementById('courseSearch').addEventListener('input', function(e){
+    renderCourseSearch(e.target.value);
+  });
+
+  document.getElementById('courseSearchResults').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-view-course]');
+    if(!btn) return;
+    var role = btn.getAttribute('data-view-role');
+    var id = btn.getAttribute('data-view-course');
+    if(role) selectedRole = role;
+    openRow = id;
+    render();
+    var row = document.getElementById('row-'+id);
+    if(row){
+      row.scrollIntoView({behavior:'smooth',block:'center'});
+      row.classList.add('flash');
+      setTimeout(function(){ row.classList.remove('flash'); },1000);
+    }
+  });
+
+  renderCourseSearch('');
+  render();
+})();
+</script>
+</body>
+</html>
